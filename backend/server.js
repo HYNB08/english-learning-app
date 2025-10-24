@@ -69,8 +69,7 @@ async function initDatabase() {
   }
 }
 
-// 初始化数据库
-initDatabase();
+// 延迟初始化数据库（在需要时初始化）
 
 // 中间件：验证JWT Token
 const authenticateToken = (req, res, next) => {
@@ -102,6 +101,9 @@ app.get('/', (req, res) => {
 // 注册API
 app.post('/api/register', async (req, res) => {
   try {
+    // 确保数据库表存在
+    await initDatabase();
+    
     const { username, email, password, name } = req.body;
     
     // 验证输入
@@ -158,6 +160,9 @@ app.post('/api/register', async (req, res) => {
 // 登录API
 app.post('/api/login', async (req, res) => {
   try {
+    // 确保数据库表存在
+    await initDatabase();
+    
     const { username, password } = req.body;
     
     if (!username || !password) {
