@@ -10,12 +10,12 @@ const PORT = process.env.PORT || 3000;
 
 // 中间件
 app.use(cors({
-  origin: ['http://localhost:3000', 'https://your-frontend-domain.vercel.app'],
+  origin: ['http://localhost:3000', 'https://english-app-frontend-ruby.vercel.app'],
   credentials: true
 }));
 app.use(express.json());
 
-// 创建数据库连接池
+// 创建数据库连接池（适配 Vercel）
 const pool = mysql.createPool({
   host: process.env.MYSQL_HOST || 'localhost',
   port: process.env.MYSQL_PORT || 3306,
@@ -23,8 +23,11 @@ const pool = mysql.createPool({
   password: process.env.MYSQL_PASSWORD || '',
   database: process.env.MYSQL_DATABASE || 'english_app',
   waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0
+  connectionLimit: 5, // Vercel 限制连接数
+  queueLimit: 0,
+  acquireTimeout: 60000, // 60秒超时
+  timeout: 60000, // 60秒超时
+  reconnect: true
 });
 
 // 初始化数据库表
@@ -351,9 +354,15 @@ app.use('*', (req, res) => {
   res.status(404).json({ error: 'API接口不存在' });
 });
 
-// 启动服务器
-app.listen(PORT, () => {
-  console.log(`🚀 服务器运行在端口 ${PORT}`);
-  console.log(`📡 API地址: http://localhost:${PORT}`);
-  console.log(`📚 文档地址: http://localhost:${PORT}/`);
-});
+// 启动服务器（适配 Vercel）
+if (process.env.NODE_ENV === 'production') {
+  // Vercel 环境
+  module.exports = app;
+} else {
+  // 本地开发环境
+  app.listen(PORT, () => {
+    console.log(`🚀 服务器运行在端口 ${PORT}`);
+    console.log(`📡 API地址: http://localhost:${PORT}`);
+    console.log(`📚 文档地址: http://localhost:${PORT}/`);
+  });
+}
