@@ -1,15 +1,35 @@
-{
-  "version": 2,
-  "builds": [
-    {
-      "src": "backend/server.js",
-      "use": "@vercel/node"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/backend/server.js"
-    }
-  ]
-}
+   {
+     "version": 2,
+     "builds": [
+       {
+         "src": "backend/server.js",
+         "use": "@vercel/node"
+       }
+     ],
+     "routes": [
+       {
+         "src": "/api/(.*)",
+         "dest": "/backend/server.js"
+       },
+       {
+         "src": "/(.*)",
+         "dest": "/backend/server.js"
+       }
+     ]
+   }
+   ```
+5. **提交信息**：`Fix vercel.json configuration`
+6. **点击 "Commit changes"**
+
+## 🔄 **修改完成后**
+
+上传完成后：
+1. **Vercel 会自动重新部署**
+2. **等待 1-2 分钟**
+3. **测试后端 API**
+
+## 🎯 **现在开始**
+
+**访问 GitHub，更新 `vercel.json` 文件！**
+
+完成后告诉我是否成功上传，然后我们测试后端 API！
