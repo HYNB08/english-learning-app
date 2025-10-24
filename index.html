@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>英语学习应用</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#1E88E5',
+                        secondary: '#64B5F6',
+                        accent: '#0D47A1',
+                        light: '#E3F2FD',
+                        dark: '#0D47A1',
+                    }
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .btn-primary {
+                @apply bg-primary hover:bg-accent text-white font-bold py-3 px-6 rounded-full transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50;
+            }
+            .btn-secondary {
+                @apply bg-white hover:bg-gray-100 text-primary font-bold py-3 px-6 rounded-full border border-primary transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50;
+            }
+            .input-primary {
+                @apply bg-white border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-blue-100 min-h-screen font-sans">
+    <!-- App Container -->
+    <div id="app" class="max-w-md mx-auto mx-auto bg-white shadow-xl rounded-2xl overflow-hidden relative">
+        <!-- Navigation Bar -->
+        <nav class="bg-primary text-white p-4 flex justify-between items-center">
+            <div class="flex items-center">
+                <i class="fa fa-book text-2xl mr-2"></i>
+                <h1 class="text-xl font-bold">英语大师</h1>
+            </div>
+            <div class="flex items-center">
+                <i class="fa fa-user-circle text-xl cursor-pointer" onclick="showScreen('profile-screen')" id="user-icon"></i>
+                <button id="login-btn" class="ml-4 bg-white bg-opacity-20 px-3 py-1 rounded-full text-sm hover:bg-opacity-30 transition-all" onclick="showScreen('login-screen')">
+                    登录
+                </button>
+                <button id="logout-btn" class="ml-4 bg-white bg-opacity-20 px-3 py-1 rounded-full text-sm hover:bg-opacity-30 transition-all hidden" onclick="logout()">
+                    退出
+                </button>
+            </div>
+        </nav>
+
+        <!-- Screens Container -->
+        <div class="screens">
+            <!-- Login Screen -->
+            <div id="login-screen" class="screen hidden p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <button onclick="showScreen('home-screen')" class="text-primary">
+                        <i class="fa fa-arrow-left mr-1"></i> 返回
+                    </button>
+                    <h2 class="text-xl font-bold">用户登录</h2>
+                    <div class="w-6"></div>
+                </div>
+
+                <div class="bg-white rounded-xl p-6 shadow-md mb-6">
+                    <div class="text-center mb-6">
+                        <div class="w-20 h-20 bg-primary rounded-full mx-auto mb-4 flex items-center justify-center">
+                            <i class="fa fa-user text-white text-3xl"></i>
+                        </div>
+                        <h3 class="text-lg font-medium text-gray-800">欢迎回来</h3>
+                        <p class="text-gray-500 text-sm">请登录您的账户</p>
+                    </div>
+
+                    <form id="login-form" class="space-y-4">
+                        <div>
+                            <label for="username" class="block text-sm font-medium text-gray-700 mb-1">用户名/邮箱</label>
+                            <input type="text" id="username" name="username" class="input-primary w-full" placeholder="请输入用户名或邮箱" required>
+                        </div>
+                        <div>
+                            <label for="password" class="block text-sm font-medium text-gray-700 mb-1">密码</label>
+                            <input type="password" id="password" name="password" class="input-primary w-full" placeholder="请输入密码" required>
+                        </div>
+                        
+                        <button type="submit" class="btn-primary w-full">
+                            <i class="fa fa-sign-in mr-2"></i>登录
+                        </button>
+                    </form>
+
+                    <div class="mt-6 text-center">
+                        <p class="text-gray-500 text-sm">还没有账户？</p>
+                        <button onclick="showScreen('register-screen')" class="text-primary hover:text-accent font-medium">
+                            立即注册
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Register Screen -->
+            <div id="register-screen" class="screen hidden p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <button onclick="showScreen('login-screen')" class="text-primary">
+                        <i class="fa fa-arrow-left mr-1"></i> 返回
+                    </button>
+                    <h2 class="text-xl font-bold">用户注册</h2>
+                    <div class="w-6"></div>
+                </div>
+
+                <div class="bg-white rounded-xl p-6 shadow-md mb-6">
+                    <div class="text-center mb-6">
+                        <div class="w-20 h-20 bg-green-500 rounded-full mx-auto mb-4 flex items-center justify-center">
+                            <i class="fa fa-user-plus text-white text-3xl"></i>
+                        </div>
+                        <h3 class="text-lg font-medium text-gray-800">创建新账户</h3>
+                        <p class="text-gray-500 text-sm">开始您的英语学习之旅</p>
+                    </div>
+
+                    <form id="register-form" class="space-y-4">
+                        <div>
+                            <label for="reg-username" class="block text-sm font-medium text-gray-700 mb-1">用户名</label>
+                            <input type="text" id="reg-username" name="username" class="input-primary w-full" placeholder="请输入用户名" required>
+                        </div>
+                        <div>
+                            <label for="reg-email" class="block text-sm font-medium text-gray-700 mb-1">邮箱</label>
+                            <input type="email" id="reg-email" name="email" class="input-primary w-full" placeholder="请输入邮箱地址" required>
+                        </div>
+                        <div>
+                            <label for="reg-password" class="block text-sm font-medium text-gray-700 mb-1">密码</label>
+                            <input type="password" id="reg-password" name="password" class="input-primary w-full" placeholder="请输入密码" required>
+                        </div>
+                        <div>
+                            <label for="confirm-password" class="block text-sm font-medium text-gray-700 mb-1">确认密码</label>
+                            <input type="password" id="confirm-password" name="confirmPassword" class="input-primary w-full" placeholder="请再次输入密码" required>
+                        </div>
+                        
+                        <button type="submit" class="btn-primary w-full">
+                            <i class="fa fa-user-plus mr-2"></i>注册
+                        </button>
+                    </form>
+
+                    <div class="mt-6 text-center">
+                        <p class="text-gray-500 text-sm">已有账户？</p>
+                        <button onclick="showScreen('login-screen')" class="text-primary hover:text-accent font-medium">
+                            立即登录
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Home Screen -->
+            <div id="home-screen" class="screen active p-6">
+                <div class="bg-primary text-white rounded-xl p-6 mb-6 relative overflow-hidden">
+                    <h2 class="text-xl font-bold mb-2">欢迎使用英语学习应用</h2>
+                    <p class="text-blue-100">开始您的英语学习之旅</p>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <button onclick="showScreen('listening-screen')" class="bg-white rounded-xl p-4 flex flex-col items-center justify-center shadow-md hover:shadow-lg transition-shadow">
+                        <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mb-2">
+                            <i class="fa fa-headphones text-primary text-xl"></i>
+                        </div>
+                        <span class="font-medium">听力</span>
+                    </button>
+                    <button onclick="showScreen('reading-screen')" class="bg-white rounded-xl p-4 flex flex-col items-center justify-center shadow-md hover:shadow-lg transition-shadow">
+                        <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mb-2">
+                            <i class="fa fa-book text-primary text-xl"></i>
+                        </div>
+                        <span class="font-medium">阅读</span>
+                    </button>
+                    <button onclick="showScreen('vocabulary-screen')" class="bg-white rounded-xl p-4 flex flex-col items-center justify-center shadow-md hover:shadow-lg transition-shadow">
+                        <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mb-2">
+                            <i class="fa fa-list-alt text-primary text-xl"></i>
+                        </div>
+                        <span class="font-medium">词汇</span>
+                    </button>
+                    <button onclick="showScreen('profile-screen')" class="bg-white rounded-xl p-4 flex flex-col items-center justify-center shadow-md hover:shadow-lg transition-shadow">
+                        <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mb-2">
+                            <i class="fa fa-user text-primary text-xl"></i>
+                        </div>
+                        <span class="font-medium">我的</span>
+                    </button>
+                </div>
+
+                <div class="bg-white rounded-xl p-6 shadow-md">
+                    <h2 class="text-lg font-bold mb-4">功能说明</h2>
+                    <div class="space-y-3 text-sm text-gray-600">
+                        <p>• 支持用户注册和登录</p>
+                        <p>• 听力、阅读、词汇练习</p>
+                        <p>• 学习进度统计</p>
+                        <p>• 移动端适配</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Screen -->
+            <div id="profile-screen" class="screen hidden p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <button onclick="showScreen('home-screen')" class="text-primary">
+                        <i class="fa fa-arrow-left mr-1"></i> 返回
+                    </button>
+                    <h2 class="text-xl font-bold">个人中心</h2>
+                    <div class="w-6"></div>
+                </div>
+
+                <div class="bg-white rounded-xl p-6 shadow-md mb-6 text-center">
+                    <div class="w-24 h-24 bg-blue-100 rounded-full mx-auto mb-4 flex items-center justify-center">
+                        <i class="fa fa-user text-primary text-4xl" id="profile-avatar"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-1" id="profile-name">请先登录</h3>
+                    <p class="text-gray-500 mb-4" id="profile-level">未登录用户</p>
+                    <div id="login-prompt" class="mt-4">
+                        <button onclick="showScreen('login-screen')" class="btn-primary">
+                            <i class="fa fa-sign-in mr-2"></i>立即登录
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 其他屏幕占位 -->
+            <div id="listening-screen" class="screen hidden p-6">
+                <div class="text-center">
+                    <h2 class="text-xl font-bold mb-4">听力练习</h2>
+                    <p class="text-gray-600">功能开发中...</p>
+                    <button onclick="showScreen('home-screen')" class="btn-primary mt-4">返回首页</button>
+                </div>
+            </div>
+
+            <div id="reading-screen" class="screen hidden p-6">
+                <div class="text-center">
+                    <h2 class="text-xl font-bold mb-4">阅读练习</h2>
+                    <p class="text-gray-600">功能开发中...</p>
+                    <button onclick="showScreen('home-screen')" class="btn-primary mt-4">返回首页</button>
+                </div>
+            </div>
+
+            <div id="vocabulary-screen" class="screen hidden p-6">
+                <div class="text-center">
+                    <h2 class="text-xl font-bold mb-4">词汇练习</h2>
+                    <p class="text-gray-600">功能开发中...</p>
+                    <button onclick="showScreen('home-screen')" class="btn-primary mt-4">返回首页</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <div class="bg-white border-t border-gray-200 flex justify-around items-center p-3">
+            <button onclick="showScreen('home-screen')" class="nav-btn flex flex-col items-center text-primary">
+                <i class="fa fa-home text-xl"></i>
+                <span class="text-xs mt-1">首页</span>
+            </button>
+            <button onclick="showScreen('profile-screen')" class="nav-btn flex flex-col items-center text-gray-400">
+                <i class="fa fa-user text-xl"></i>
+                <span class="text-xs mt-1">我的</span>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // 全局变量
+        let currentUser = null;
+        let isLoggedIn = false;
+        
+        // API基础URL - 部署后需要修改为Railway的URL
+        const API_BASE_URL = 'http://localhost:3000/api';
+        
+        // DOM元素
+        const screens = document.querySelectorAll('.screen');
+        const navBtns = document.querySelectorAll('.nav-btn');
+
+        // 显示屏幕
+        function showScreen(screenId) {
+            screens.forEach(screen => {
+                screen.classList.add('hidden');
+            });
+            document.getElementById(screenId).classList.remove('hidden');
+            
+            // 更新导航按钮
+            navBtns.forEach(btn => {
+                btn.classList.remove('text-primary');
+                btn.classList.add('text-gray-400');
+            });
+            
+            // 高亮当前导航按钮
+            const activeNavBtn = document.querySelector(`button[onclick="showScreen('${screenId}')"]`);
+            if (activeNavBtn) {
+                activeNavBtn.classList.remove('text-gray-400');
+                activeNavBtn.classList.add('text-primary');
+            }
+        }
+
+        // 登录功能
+        async function login(username, password) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('currentUser', JSON.stringify(data.user));
+                    
+                    currentUser = data.user;
+                    isLoggedIn = true;
+                    updateLoginUI();
+                    showScreen('home-screen');
+                    showMessage('登录成功！', 'success');
+                    return true;
+                } else {
+                    showMessage('登录失败：' + data.error, 'error');
+                    return false;
+                }
+            } catch (error) {
+                showMessage('网络错误，请检查后端服务器', 'error');
+                console.error('登录错误:', error);
+                return false;
+            }
+        }
+
+        // 注册功能
+        async function register(userData) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/register`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(userData)
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showMessage('注册成功！请登录', 'success');
+                    showScreen('login-screen');
+                    return true;
+                } else {
+                    showMessage('注册失败：' + data.error, 'error');
+                    return false;
+                }
+            } catch (error) {
+                showMessage('网络错误，请检查后端服务器', 'error');
+                console.error('注册错误:', error);
+                return false;
+            }
+        }
+
+        // 退出登录
+        function logout() {
+            currentUser = null;
+            isLoggedIn = false;
+            localStorage.removeItem('currentUser');
+            localStorage.removeItem('token');
+            updateLoginUI();
+            showScreen('home-screen');
+            showMessage('已退出登录', 'info');
+        }
+
+        // 更新登录UI
+        function updateLoginUI() {
+            const loginBtn = document.getElementById('login-btn');
+            const logoutBtn = document.getElementById('logout-btn');
+            const userIcon = document.getElementById('user-icon');
+
+            if (isLoggedIn && currentUser) {
+                loginBtn.classList.add('hidden');
+                logoutBtn.classList.remove('hidden');
+                userIcon.title = `欢迎，${currentUser.name}`;
+                updateProfilePage();
+            } else {
+                loginBtn.classList.remove('hidden');
+                logoutBtn.classList.add('hidden');
+                userIcon.title = '点击登录';
+                updateProfilePage();
+            }
+        }
+
+        // 更新个人资料页面
+        function updateProfilePage() {
+            const profileName = document.getElementById('profile-name');
+            const profileLevel = document.getElementById('profile-level');
+            const loginPrompt = document.getElementById('login-prompt');
+
+            if (isLoggedIn && currentUser) {
+                profileName.textContent = currentUser.name;
+                profileLevel.textContent = `${currentUser.level}学习者`;
+                loginPrompt.style.display = 'none';
+            } else {
+                profileName.textContent = '请先登录';
+                profileLevel.textContent = '未登录用户';
+                loginPrompt.style.display = 'block';
+            }
+        }
+
+        // 显示消息
+        function showMessage(message, type = 'info') {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `fixed top-4 right-4 z-50 px-6 py-3 rounded-lg shadow-lg text-white font-medium transform transition-all duration-300 translate-x-full`;
+            
+            switch(type) {
+                case 'success':
+                    messageDiv.classList.add('bg-green-500');
+                    break;
+                case 'error':
+                    messageDiv.classList.add('bg-red-500');
+                    break;
+                case 'warning':
+                    messageDiv.classList.add('bg-yellow-500');
+                    break;
+                default:
+                    messageDiv.classList.add('bg-blue-500');
+            }
+            
+            messageDiv.textContent = message;
+            document.body.appendChild(messageDiv);
+
+            setTimeout(() => {
+                messageDiv.classList.remove('translate-x-full');
+            }, 100);
+
+            setTimeout(() => {
+                messageDiv.classList.add('translate-x-full');
+                setTimeout(() => {
+                    document.body.removeChild(messageDiv);
+                }, 300);
+            }, 3000);
+        }
+
+        // 检查登录状态
+        function checkLoginStatus() {
+            const savedUser = localStorage.getItem('currentUser');
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                isLoggedIn = true;
+                updateLoginUI();
+            }
+        }
+
+        // 表单验证
+        function validateLoginForm(formData) {
+            if (!formData.username.trim()) {
+                showMessage('请输入用户名或邮箱', 'error');
+                return false;
+            }
+            if (!formData.password.trim()) {
+                showMessage('请输入密码', 'error');
+                return false;
+            }
+            return true;
+        }
+
+        function validateRegisterForm(formData) {
+            if (!formData.username.trim()) {
+                showMessage('请输入用户名', 'error');
+                return false;
+            }
+            if (!formData.email.trim()) {
+                showMessage('请输入邮箱', 'error');
+                return false;
+            }
+            if (!formData.password.trim()) {
+                showMessage('请输入密码', 'error');
+                return false;
+            }
+            if (formData.password.length < 6) {
+                showMessage('密码长度至少6位', 'error');
+                return false;
+            }
+            if (formData.password !== formData.confirmPassword) {
+                showMessage('两次输入的密码不一致', 'error');
+                return false;
+            }
+            return true;
+        }
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            checkLoginStatus();
+            showScreen('home-screen');
+
+            // 登录表单提交
+            const loginForm = document.getElementById('login-form');
+            if (loginForm) {
+                loginForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    const formData = {
+                        username: document.getElementById('username').value,
+                        password: document.getElementById('password').value
+                    };
+
+                    if (validateLoginForm(formData)) {
+                        login(formData.username, formData.password);
+                    }
+                });
+            }
+
+            // 注册表单提交
+            const registerForm = document.getElementById('register-form');
+            if (registerForm) {
+                registerForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    const formData = {
+                        username: document.getElementById('reg-username').value,
+                        email: document.getElementById('reg-email').value,
+                        password: document.getElementById('reg-password').value,
+                        confirmPassword: document.getElementById('confirm-password').value
+                    };
+
+                    if (validateRegisterForm(formData)) {
+                        register(formData);
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
